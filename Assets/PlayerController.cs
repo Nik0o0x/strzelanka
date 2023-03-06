@@ -1,61 +1,43 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    Vector2 inputVector;
-    Rigidbody rb;
+    public GameObject bulletPrefab;
+    Vector2 movementVector;
+    Transform bulletSpawn;
 
     // Start is called before the first frame update
     void Start()
     {
-        inputVector = Vector2.zero;    
-        rb = GetComponent<Rigidbody>();
+        movementVector = Vector2.zero;
+        bulletSpawn = transform.Find("bulletspawn");
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("Wychylenie kontrolera: " + inputVector.ToString());
-
-
-        //metoda bez u¿ycia fizyki
-        //Vector3 movement = new Vector3(0, 0, inputVector.y);
-        //transform.Translate(movement); 
-        //Vector3 rotation = new Vector3(0, inputVector.x, 0);
-        //transform.Rotate(rotation);
-        
-    }
-    private void FixedUpdate()
-    {
-        if(inputVector.y == 0)
-        {
-            //nie trzymamy wciœniêtego "w" ani "s"
-            rb.velocity = Vector3.zero;
-        } 
-        else
-        {
-            //metoda z fizyk¹
-            //wez kierunek do przodu wzglêdem postaci i przemnó¿ przez wychylenie kontrolera
-            Vector3 movement = transform.forward * inputVector.y;
-            rb.AddForce(movement, ForceMode.Impulse);
-        }
-        if(inputVector.x == 0)
-        {
-            rb.angularVelocity = Vector3.zero;
-        } 
-        else
-        {
-            Vector3 rotation = transform.up * inputVector.x;
-            rb.AddTorque(rotation, ForceMode.Impulse);
-        }
-        
+        //obrÃ³t wokÃ³Â³ osi Y o iloÅ“Ã¦ stopni rÃ³wnÂ¹ wartosci osi X kontrolera
+        transform.Rotate(Vector3.up * movementVector.x);
+        //przesuniÃªcie do przodu (transform.forward) o wychylenie osi Y kontrolera w czasie jednej klatki
+        transform.Translate(Vector3.forward * movementVector.y * Time.deltaTime);
     }
 
     void OnMove(InputValue inputValue)
     {
-        inputVector = inputValue.Get<Vector2>();
+        movementVector = inputValue.Get<Vector2>();
+
+        //Debug.Log(movementVector.ToString());
+    }
+
+    void OnFire()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawn);
+        bullet.transform.parent = null;
+        bullet.GetComponent<Rigidbody>().AddForce(bullet.transform.forward * 10, ForceMode.VelocityChange);
+        Destroy(bullet, 5);
     }
 }

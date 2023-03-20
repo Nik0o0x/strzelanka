@@ -1,4 +1,4 @@
-ï»¿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,6 +7,8 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public GameObject bulletPrefab;
+    public float bulletSpeed = 20;
+    public float playerSpeed = 2;
     Vector2 movementVector;
     Transform bulletSpawn;
 
@@ -14,19 +16,19 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         movementVector = Vector2.zero;
-        bulletSpawn = transform.Find("bulletspawn");
+        bulletSpawn = transform.Find("BulletSpawn");
     }
 
     // Update is called once per frame
     void Update()
     {
-        //obrÃ³t wokÃ³Â³ osi Y o iloÅ“Ã¦ stopni rÃ³wnÂ¹ wartosci osi X kontrolera
+        //obrót wokó³ osi Y o iloœæ stopni równ¹ wartosci osi X kontrolera
         transform.Rotate(Vector3.up * movementVector.x);
-        //przesuniÃªcie do przodu (transform.forward) o wychylenie osi Y kontrolera w czasie jednej klatki
-        transform.Translate(Vector3.forward * movementVector.y * Time.deltaTime);
+        //przesuniêcie do przodu (transform.forward) o wychylenie osi Y kontrolera w czasie jednej klatki
+        transform.Translate(Vector3.forward * movementVector.y * Time.deltaTime * playerSpeed);
     }
-
-    void OnMove(InputValue inputValue)
+    
+    void OnMove(InputValue inputValue) 
     {
         movementVector = inputValue.Get<Vector2>();
 
@@ -37,7 +39,7 @@ public class PlayerController : MonoBehaviour
     {
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawn);
         bullet.transform.parent = null;
-        bullet.GetComponent<Rigidbody>().AddForce(bullet.transform.forward * 10, ForceMode.VelocityChange);
+        bullet.GetComponent<Rigidbody>().AddForce(bullet.transform.forward*bulletSpeed, ForceMode.VelocityChange);
         Destroy(bullet, 5);
     }
 }
